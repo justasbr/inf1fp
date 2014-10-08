@@ -68,7 +68,7 @@ lowerRec (x:xs) = toLower x : lowerRec xs
 
 	
 containsRec :: String -> String -> Bool
---containsRec [] _ = []
+--containsRec [] _ = False
 containsRec str goal | isPrefixOf goal str = True
 					 | otherwise = containsRec (tail str) goal
 					 
@@ -83,5 +83,10 @@ factorial :: Int -> Int
 factorial m | m <= 0 = 1
 			| otherwise = m * factorial (m-1)
 			
-crosswordFind :: Char -> Int -> Int -> [String] -> [String]
-crosswordFind char pos len xs
+
+lookUp :: Char -> [(Char,Char)] -> Char
+lookUp c [] = c
+lookUp c (x:xs) | (fst x) == c = snd x
+				| otherwise = lookUp c xs
+				
+				
