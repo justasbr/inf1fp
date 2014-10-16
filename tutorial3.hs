@@ -162,7 +162,10 @@ zipWith__ f xs ys = (map . uncurry) f $ zip xs ys
 -- 7.
 plusM :: Matrix -> Matrix -> Matrix --TODO erros on invalid inputs
 --plusM m1 m2 = [plusRow r1 r2| (r1,r2) <- zip m1 m2]
-plusM m1 m2 = (map. uncurry) plusRow $ zip m1 m2 
+plusM m1 m2 | (length m1 == length m2) && (valid m1) && (valid m2) && ((length $ head m1) == (length $ head m2))
+			--checking if m1 and m2 are valid and if they have the same # of rows and columns
+			= (map. uncurry) plusRow $ zip m1 m2 
+			| True = error("Bad input")
 		  
 plusRow :: [Int] -> [Int] -> [Int]
 plusRow r1 r2 = zipWith (+) r1 r2
@@ -173,8 +176,10 @@ dotRow :: [Int] -> [Int] -> Int
 dotRow r1 r2 = sum $ zipWith (*) r1 r2
 
 timesM :: Matrix -> Matrix -> Matrix
-timesM m1 m2 = [[ dotRow row1 row2 | row2 <- b] | row1 <- m1]
-	where b = transpose m2 --TODO errors on bad inputs
+timesM m1 m2 | (valid m1) && (valid m2) && ((length $ head m1) == (length m2)) 
+			--Checking number of cols in m1 and number of rows in r2
+			 = [[ dotRow row1 row2 | row2 <- (transpose m2)] | row1 <- m1]
+			 | True = error("Bad input")
 
 -- Optional material
 -- 9.
