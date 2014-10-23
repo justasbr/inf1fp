@@ -96,13 +96,18 @@ prop_contains str x y = contains substr (map toUpper str) &&
 
 -- 4.
 takeUntil :: String -> String -> String
-takeUntil s b | contains s b = head [take (length b - y) b | (x,y) <- zip (map (prefix s) (tails' b)) ([length b,(length b) - 1..0]), x]
+takeUntil s b | contains s b = head [take (length b - y) b | (x,y) <- zip prefixOfTails lenList, x]
 			  | True = b
+	where
+	prefixOfTails = (map (prefix s) (tails' b))
+	lenList = ([length b,(length b) - 1..0])
 			  
 dropUntil :: String -> String -> String
-dropUntil s b | contains s b = head [drop ((length b) - y + (length s)) b | (x,y) <- zip (map (prefix s) (tails' b)) ([length b,(length b) - 1..0]), x]
+dropUntil s b | contains s b = head [drop ((length b) - y + (length s)) b | (x,y) <- zip prefixOfTails lenList, x]
 			  | True = b
-
+	where
+	prefixOfTails = (map (prefix s) (tails' b))
+	lenList = ([length b,(length b) - 1..0])
 
 -- 5.
 split :: String -> String -> [String]
@@ -110,8 +115,6 @@ split [] _ = error("empty separator")
 split a str | contains a str = (takeUntil a str) : (split a (dropUntil a str))
 			| True = [str]
 
---connect :: String -> String -> String -> String
---connect a b sep :: a ++ sep ++ b
 
 reconstruct :: String -> [String] -> String
 reconstruct a [x] = x
@@ -125,16 +128,13 @@ prop_split c sep str = reconstruct sep' (split sep' str) `sameString` str
 linksFromHTML :: HTML -> [Link]
 linksFromHTML src= split aTag (dropUntil aTag src)
 	where aTag ="<a href=\""
-	
 
 testLinksFromHTML :: Bool
 testLinksFromHTML  =  linksFromHTML testHTML == testLinks
 
-
 -- 7.
 takeEmails :: [Link] -> [Link]
 takeEmails links = filter (prefix "mailto:") links
-
 
 -- 8.
 link2pair :: Link -> (Name,Email)
@@ -148,16 +148,13 @@ emailsFromHTML src = map link2pair (takeEmails (linksFromHTML src))
 testEmailsFromHTML :: Bool
 testEmailsFromHTML  =  emailsFromHTML testHTML == testAddrBook
 
-
 -- 10.
 findEmail :: Name -> [(Name, Email)] -> [(Name, Email)]
 findEmail name list = filter (\x -> contains name (fst x)) list
 
-
 -- 11.
 emailsByNameFromHTML :: HTML -> Name -> [(Name,Email)]
 emailsByNameFromHTML src name = findEmail name (emailsFromHTML src)
-
 
 -- Optional Material
 
