@@ -1,5 +1,6 @@
 import Data.Char
 import Data.List
+import Test.QuickCheck
 
 double x = x + x
 double2 x = double x + double x
@@ -99,7 +100,96 @@ numLongChains :: Int
 numLongChains = length (filter isLong (map chain [1..100]))  
     where isLong xs = length xs > 15 
 
-map' :: (a -> b) -> [a] -> [b]  
-map' f xs = foldr (\x acc -> f x : acc) [] xs
+d :: [Int] -> [Int]
+d [] = []
+d [x] = []
+d (x:y:xs) | x == y = x : d (y:xs)
+		   | True = d (y:xs)
+		 
+--c :: [Int] -> [Int]
+--c xs = [a | (a,b) <- zip xs (tail xs), a==b]
 
-map' f xs = foldl (\acc x -> acc ++ [f x]) [] xs
+--prop_cd :: [Int] -> Bool
+--prop_cd xs = c xs == d xs
+	
+f :: Char -> Int
+f c | isDigit c = ord c - ord '0'
+	| elem (toUpper c) ['A'..'F'] = ord (toUpper c) - ord 'A' + 10
+	| True = error("bad")
+	
+isHex :: Char -> Bool
+isHex c = (isDigit c || elem (toUpper c) ['A'..'F'])
+	
+g :: String -> Int
+g xs = maximum (-1 : [f x | x <- xs, isHex x])
+
+h :: String -> Int
+h [] = -1
+h (x:xs) | isHex x = max (f x) (h xs)
+		 | True = h xs
+
+c :: [Int] -> Int
+c [] = error("empty list")
+c xs = product [a-b | (a,b) <- zip xs (tail xs)]
+
+dd :: [Int] -> Int
+dd [] = error("empty list")
+dd [x] = 1
+dd (x:y:xs) = (x-y) * dd (y:xs)
+
+prop_cdd :: [Int] -> Bool
+prop_cdd xs = null xs || c xs == dd xs
+
+aa :: Char -> Bool
+aa c | elem (toUpper c) ['A'..'M'] = True
+	 | elem (toUpper c) ['N'..'Z'] = False
+	 | True = error("not alphabet letter")
+bb :: String -> Bool
+bb xs = firstHalf > secondHalf
+	where 
+	firstHalf = length [x | x<-xs, isAlpha x, aa x]
+	secondHalf = length [x | x<-xs, isAlpha x, not (aa x)]
+
+rbb :: String -> Bool
+rbb str = score str > 0
+	where
+	score [] = 0
+	score (x:xs) | not (isAlpha x) = score xs
+				 | aa x = 1 + score xs
+				 | not (aa x) = (-1) + score xs
+prop_bbrbb :: String -> Bool
+prop_bbrbb str = bb str == rbb str
+
+f2013 :: Char -> Int
+f2013 c | elem c "HASKELL" = 10
+		| elem c ['A'..'Z'] = 2
+		| elem c "haskell" = 5
+		| elem c ['a'..'z'] = 1
+		| True = 0
+g2013 :: String -> Int
+g2013 str = product [f2013 x | x <- str, isAlpha x]
+
+g2013r :: String -> Int
+g2013r [] = 1
+g2013r (x:xs) | isAlpha x = (f2013 x) * (g2013r xs)
+			  | True = g2013r xs
+prop_g2013 :: String -> Bool
+prop_g2013 str = g2013 str == g2013r str
+
+c2013 :: String -> String -> String
+c2013 a b = [x | (x,y) <- zip a b, x==y]
+
+c2013r :: String -> String -> String
+c2013r [] _ = []
+c2013r _ [] = []
+c2013r (x:xs) (y:ys) | x==y = x : c2013r xs ys
+					 | True = c2013r xs ys
+					 
+prop_c2013 :: String -> String -> Bool
+prop_c2013 x y = c2013 x y == c2013r x y
+
+numUniques :: (Eq a) => [a] -> Int
+numUniques = length . nub
+
+sameString :: String -> String -> Bool
+sameString a b = map toUpper a == map toUpper b
