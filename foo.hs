@@ -1,6 +1,7 @@
 import Data.Char
 import Data.List
 import Test.QuickCheck
+import qualified Data.Map as Map
 
 double x = x + x
 double2 x = double x + double x
@@ -193,3 +194,20 @@ numUniques = length . nub
 
 sameString :: String -> String -> Bool
 sameString a b = map toUpper a == map toUpper b
+m = Map.empty
+
+data Exp = Lit Int
+		 | Add Exp Exp
+		 | Mul Exp Exp
+evalExp :: Exp -> Int
+evalExp (Lit n) = n
+evalExp (Add e f) = evalExp e + evalExp f
+evalExp (Mul e f) = evalExp e * evalExp f
+
+showExp :: Exp -> String
+showExp (Lit n) = show n
+showExp (Add e f) = par (showExp e ++ "+" ++ showExp f)
+showExp (Mul e f) = par (showExp e ++ "*" ++ showExp f)
+
+par :: String -> String
+par s = "(" ++ s ++ ")"
