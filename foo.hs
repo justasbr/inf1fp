@@ -211,3 +211,6 @@ showExp (Mul e f) = par (showExp e ++ "*" ++ showExp f)
 
 par :: String -> String
 par s = "(" ++ s ++ ")"
+
+strToInt :: String -> Int
+strToInt str = read str :: Int
