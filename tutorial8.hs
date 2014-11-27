@@ -130,4 +130,7 @@ deterministic fsm = (u,a,s,f,t)
 	f = dfinal fsm u --final states
 	t = dtrans fsm u
 
+test_10 :: Bool
+test_10 = deterministic m1 == dm1
+
 
