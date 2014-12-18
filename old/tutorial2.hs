@@ -131,3 +131,4 @@ sortByFreq (x:xs) = sortByFreq([a | a <- xs, (freq 'E' a) > (freq 'E' x)]) ++
 			  [x] ++ 
 		      sortByFreq([b | b <- xs, (freq 'E' b) <= (freq 'E' x)])
 			  where freq c str = lookUpInt c (countFreqs str)
+			
